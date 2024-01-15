@@ -1,0 +1,36 @@
+version: '3.6'
+
+services:
+  fastapi_template:
+    restart: on-failure
+    image: fastapi_template
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    volumes:
+      - ../src:/opt/app
+    environment:
+      - STAGE=docker
+    ports:
+      - "8999:8000"
+    tty: true
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    restart: on-failure
+    image: mysql:5.7
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=example
+    ports:
+      - "3306:3306"
+
+  redis:
+    restart: on-failure
+    image: redis:5
+    ports:
+      - "6379:6379"

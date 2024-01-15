@@ -1,0 +1,62 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "src"
+version = "0.1.0"
+description = ""
+authors = ["wangsiqian <wangsiqian213@gmail.com>"]
+readme = "README.md"
+
+[[tool.poetry.source]]
+name = "aliyun"
+url = "http://mirrors.aliyun.com/pypi/simple"
+default = true
+secondary = false
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+default = false
+secondary = true
+
+[tool.yapf]
+based_on_style = "google"
+coalesce_brackets = true
+dedent_closing_brackets = true
+
+[tool.isort]
+line_length = 79
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = [
+    "unittests",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "0.85.0"
+uvicorn = {version = "0.18.3", extras = ["standard"]}
+pyjwt = "2.5.0"
+aioredis = "2.0.1"
+bcrypt = "4.0.1"
+asyncpg = "0.27.0"
+sqlalchemy = "2.0.3"
+alembic = "1.9.3"
+httpx = "0.23.3"
+toml = "0.10.2"
+passlib = "^1.7.4"
+celery = {extras = ["redis"], version = "^5.3.4"}
+
+[tool.poetry.group.test.dependencies]
+pytest = "7.2.1"
+pytest-asyncio = "0.20.3"
+greenlet = "^2.0.2"
+
+[tool.poetry.group.dev.dependencies]
+yapf = "^0.32.0"
+isort = "^5.12.0"
