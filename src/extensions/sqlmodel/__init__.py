@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import AsyncAdaptedQueuePool
-from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from utils.config import get_config

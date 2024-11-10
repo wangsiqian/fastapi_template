@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 from fastapi import APIRouter
-from sqlmodel import select
+from sqlmodel import col, select
 
 from apps.example.exceptions import PersonAlreadyExist, PersonNotFound
 from apps.example.schemas import PersonIn, PersonOut
@@ -17,7 +17,7 @@ logger = logging.getLogger('example')
 @get(router, '/', response_model=List[PersonOut])
 async def list_person(context: DependsOnContext):
     people = await context.sa_session.scalars(
-        select(Person).order_by(Person.created_at.desc())
+        select(Person).order_by(col(Person.created_at).desc())
     )
     return people.all()
 

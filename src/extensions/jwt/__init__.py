@@ -1,9 +1,9 @@
-from typing import Annotated, cast
+from typing import Annotated
 
 import jwt
 from aioredis import Redis
 from fastapi import Depends, Header
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from extensions.aioredis import yield_async_redis_session
 from extensions.jwt.exceptions import (
