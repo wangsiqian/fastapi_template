@@ -43,7 +43,7 @@ def test(test_names):
 @cli.command('migrate')
 @click.argument('commit', required=False, nargs=-1)
 def migrate(commit):
-    path = Path('models', 'migrations', 'versions')
+    path = Path('models/migrations', 'versions')
     if path.exists():
         has_versions = any(
             filter(lambda _dir: _dir.name.endswith('.py'), path.iterdir())
@@ -54,12 +54,12 @@ def migrate(commit):
 
     revision_args = ['revision', '--autogenerate', '-m']
     if has_versions is False:
-        revision_args.append('"init db"')
+        revision_args.append('"init database."')
     else:
         if commit:
             revision_args.append(f'"{commit}"')
         else:
-            revision_args.append('"update"')
+            revision_args.append('"update database."')
 
     alembic.config.main(argv=revision_args)
 

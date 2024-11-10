@@ -45,6 +45,9 @@ def validation_error_response(validation_error: RequestValidationError):
     errors = list()
 
     for error in validation_error.raw_errors:
+        if not hasattr(error.exc, 'raw_errors'):
+            continue
+
         for raw_error in error.exc.raw_errors:
             field_error = {
                 'error_type': 'validation_error',

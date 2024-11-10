@@ -1,11 +1,11 @@
-from typing import cast
+from typing import Annotated, cast
 
 import jwt
 from aioredis import Redis
 from fastapi import Depends, Header
 from pydantic import BaseModel, ValidationError
 
-from extensions.aioredis import get_redis
+from extensions.aioredis import yield_async_redis_session
 from extensions.jwt.exceptions import (
     AlgorithmError,
     ApiSignatureExpired,
@@ -44,7 +44,8 @@ class CurrentUser(BaseModel):
 
 
 async def get_current_user(
-    token: str = Header('token'), redis: Redis = Depends(get_redis)
+    token: str = Header('token'),
+    redis: Redis = Depends(yield_async_redis_session)
 ):
     if not token:
         raise ApiSignatureExpired
@@ -68,4 +69,4 @@ async def get_current_user(
     raise ApiSignatureExpired
 
 
-DependsOnUser: CurrentUser = cast(CurrentUser, Depends(get_current_user))
+DependsOnUser = Annotated[CurrentUser, Depends(get_current_user)]

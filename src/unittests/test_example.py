@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 
 
-async def test_list_examples(client: AsyncClient):
+async def test_list_people(client: AsyncClient):
     response = await client.get('/v1/examples/')
     assert response.status_code == 200
 

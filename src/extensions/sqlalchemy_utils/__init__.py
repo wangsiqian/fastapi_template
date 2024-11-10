@@ -118,12 +118,10 @@ async def database_exists(url):
     try:
         return bool(await _get_scalar_result(engine, sa.text(text)))
     except Exception as error:
-        if str(error).startswith('(pymysql.err.OperationalError) (2003'):
+        if 'Unknown database' in str(error):
             return False
-        else:
-            if engine:
-                await engine.dispose()
 
+    await engine.dispose()
     return True
 
 

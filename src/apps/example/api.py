@@ -2,12 +2,12 @@ import logging
 from typing import List
 
 from fastapi import APIRouter
-from sqlalchemy import select
+from sqlmodel import select
 
 from apps.example.exceptions import PersonAlreadyExist, PersonNotFound
 from apps.example.schemas import PersonIn, PersonOut
 from extensions.fastapi.api import get, post
-from extensions.fastapi.context import AppContext, DependsOnContext
+from extensions.fastapi.context import DependsOnContext
 from models import Person
 
 router = APIRouter(prefix='/v1/examples')
@@ -15,17 +15,15 @@ logger = logging.getLogger('example')
 
 
 @get(router, '/', response_model=List[PersonOut])
-async def list_examples(context: AppContext = DependsOnContext):
-    persons = await context.sa_session.scalars(
+async def list_person(context: DependsOnContext):
+    people = await context.sa_session.scalars(
         select(Person).order_by(Person.created_at.desc())
     )
-    return persons.all()
+    return people.all()
 
 
 @post(router, '/', response_model=PersonOut)
-async def create_person(
-    person_in: PersonIn, context: AppContext = DependsOnContext
-):
+async def create_person(person_in: PersonIn, context: DependsOnContext):
     person = await context.sa_session.get(Person, person_in.first_name)
     if not person:
         person = Person(
@@ -40,7 +38,7 @@ async def create_person(
 
 
 @get(router, '/{first_name}', response_model=PersonOut)
-async def get_person(first_name: str, context: AppContext = DependsOnContext):
+async def get_person(first_name: str, context: DependsOnContext):
     person = await context.sa_session.get(Person, first_name)
     if not person:
         raise PersonNotFound
@@ -48,20 +46,18 @@ async def get_person(first_name: str, context: AppContext = DependsOnContext):
 
 
 @post(router, '/{first_name}/cache')
-async def cache_person(first_name: str, context: AppContext = DependsOnContext):
+async def cache_person(first_name: str, context: DependsOnContext):
     person = await context.sa_session.get(Person, first_name)
     if not person:
         raise PersonNotFound
 
-    person_out = PersonOut.from_orm(person).json()
+    person_out = PersonOut.parse_obj(person).json()
     logger.info('Cache person: ' + person_out)
-    await context.redis.set(str(person.first_name), person_out)
+    await context.redis.set(person.first_name, person_out)
 
 
 @get(router, '/{first_name}/cache', response_model=PersonOut)
-async def get_person_from_cache(
-    first_name: str, context: AppContext = DependsOnContext
-):
+async def get_person_from_cache(first_name: str, context: DependsOnContext):
     person = await context.redis.get(first_name)
     if person:
         person = PersonOut.parse_raw(person)

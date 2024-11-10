@@ -19,6 +19,7 @@ class BaseConfig(BaseSettings):
     DB_POOL_SIZE: int = 20
     DB_POOL_OVERFLOW: int = 50
     DB_ENABLE_ECHO: bool = True
+    DB_URL = f'mysql+aiomysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}'
 
     # celery
     CELERY_ENABLED = True
@@ -29,8 +30,8 @@ class BaseConfig(BaseSettings):
     LOGGING_LEVEL: str = 'INFO'
 
     # aioredis settings
-    # aioredis://[[username]:[password]]@localhost:6379/0
-    REDIS_URL: str = 'redis://127.0.0.1:6379/0'
+    # redis://[[username]:[password]]@localhost:6379/0
+    REDIS_URL: str = 'redis://:123456@127.0.0.1:6379/0'
 
     # jwt settings
     SECRET_KEY: str = "aw(*@#Hha9s8dfy1h2342j349uh123872345365460912!x"
@@ -39,16 +40,6 @@ class BaseConfig(BaseSettings):
 
     # pytest settings
     PYTEST_ARGS = ['-s', '-x', '-v', '-p', 'no:warnings', '--color=yes']
-
-    def aio_db_url(self):
-        """aio database url
-        """
-        return f'mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}/{self.DB_DATABASE}'
-
-    def db_url(self):
-        """database url
-        """
-        return f'mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}/{self.DB_DATABASE}'
 
     def log_config(self):
         """日志配置

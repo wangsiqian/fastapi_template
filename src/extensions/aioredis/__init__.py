@@ -7,9 +7,6 @@ config = get_config()
 redis = aioredis.from_url(config.REDIS_URL, decode_responses=True)
 
 
-async def get_redis() -> Redis:
-    client: Redis = await redis.client()
-    try:
+async def yield_async_redis_session() -> Redis:
+    async with redis.client() as client:
         yield client
-    finally:
-        await client.close()

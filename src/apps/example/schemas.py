@@ -9,9 +9,6 @@ class PersonIn(BaseModel):
 
 
 class PersonOut(BaseModel):
-    first_name: str = None
-    last_name: str = None
-    created_at: datetime = None
-
-    class Config:
-        orm_mode = True
+    first_name: str
+    last_name: str
+    created_at: datetime
