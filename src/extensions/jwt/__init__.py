@@ -12,6 +12,7 @@ from extensions.jwt.exceptions import (
     JsonError,
     JwtTokenError,
 )
+from models import User
 from utils.config import get_config
 
 config = get_config()
@@ -38,11 +39,6 @@ async def parse_token(token):
     return payload
 
 
-class CurrentUser(BaseModel):
-    id: int
-    username: str
-
-
 async def get_current_user(
     token: str = Header('token'),
     redis: Redis = Depends(yield_async_redis_session)
@@ -52,21 +48,18 @@ async def get_current_user(
 
     payload = await parse_token(token)
 
-    if 'id' in payload:
-        try:
-            current_user = CurrentUser.parse_obj(payload)
-        except ValidationError:
-            raise JwtTokenError
+    try:
+        current_user = User.model_validate(payload)
+    except ValidationError:
+        raise JwtTokenError
 
-        cache_token = await redis.get(
-            f'{config.SERVICE_NAME}:user:token:{current_user.id}'
-        )
-        if cache_token != token:
-            raise ApiSignatureExpired
+    cache_token = await redis.get(
+        f'{config.SERVICE_NAME}:user:token:{current_user.id}'
+    )
+    if cache_token != token:
+        raise ApiSignatureExpired
 
-        return current_user
-
-    raise ApiSignatureExpired
+    return current_user
 
 
-DependsOnUser = Annotated[CurrentUser, Depends(get_current_user)]
+DependsOnUser = Annotated[User, Depends(get_current_user)]

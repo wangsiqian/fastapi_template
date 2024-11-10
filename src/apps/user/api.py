@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter
 from sqlmodel import select
 
@@ -42,7 +44,8 @@ async def login(user_in: UserIn, context: DependsOnContext):
     if not await user.verify_password(user_in.password):
         raise AccountOrPasswordWrong
 
-    token = await generate_token(UserOut.parse_obj(user).dict())
+    # datetime to str
+    token = await generate_token(json.loads(user.json()))
     await context.redis.set(
         f'{config.SERVICE_NAME}:user:token:{user.id}', token,
         config.EXPIRED_SECONDS
